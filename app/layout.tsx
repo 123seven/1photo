@@ -10,8 +10,8 @@ import { cn } from "@/lib/utils";
 import { fontHeading, fontSans, fontSatoshi } from "@/assets/fonts";
 
 export const metadata: Metadata = {
-  title: "Free Wind ｜ 感受自由的风～",
-  description: "装备租赁平台 ｜ 即使是一阵风，也要享受它，",
+  title: "Plan ｜ 有计划的拍摄",
+  description: "有计划的拍摄才能快速提升摄影技术",
 };
 
 export default function RootLayout({
