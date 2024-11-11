@@ -6,12 +6,20 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
 
 const PhotoPlanningTool = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedStyle, setSelectedStyle] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [selectedProps, setSelectedProps] = useState([]);
+
+  const StepNames = {
+    1: "风格",
+    2: "地点",
+    3: "服化道",
+    4: "分镜",
+  };
 
   const styles = [
     {
@@ -112,6 +120,52 @@ const PhotoPlanningTool = () => {
     森系电影: ["森林小径", "木质小屋", "湖边", "自然花田"],
     法式风情: ["街角咖啡馆", "巴黎风情建筑", "石板路", "河边桥畔"],
     美式复古: ["美式餐厅", "加油站", "旧式旅馆", "公路旁"],
+  };
+
+  const costumes = {
+    日系清新: [
+      "浅色系简洁服装",
+      "白色衬衫",
+      "碎花连衣裙",
+      "棉麻材质吊带裙",
+      "平底鞋",
+      "小白鞋",
+    ],
+    时尚现代: [
+      "修身西装",
+      "皮夹克",
+      "廓形大衣",
+      "单色连衣裙",
+      "尖头高跟鞋",
+      "短靴",
+    ],
+    暗黑情绪: ["黑色连衣裙", "长裙", "紧身衣裤", "皮质配饰", "网状元素"],
+    复古胶片: [
+      "格子衬衫",
+      "复古背带裤",
+      "毛衣",
+      "牛仔裤",
+      "复古运动鞋",
+      "马丁靴",
+    ],
+    古风古典: ["汉服", "旗袍", "古典长袍", "浅色或深色调"],
+    复古港风: ["港式风衣", "格子西装", "丝绸连衣裙", "衬衫", "尖头高跟鞋"],
+    森系电影: ["棉麻材质长裙", "开衫", "温暖围巾", "轻便平底鞋", "小皮鞋"],
+    法式风情: [
+      "黑色或深色连衣裙",
+      "小礼服",
+      "宽松毛衣",
+      "细带高跟鞋",
+      "法式平底鞋",
+    ],
+    美式复古: [
+      "波点连衣裙",
+      "高腰裤",
+      "复古T恤",
+      "牛仔夹克",
+      "粗跟鞋",
+      "复古小皮鞋",
+    ],
   };
 
   const shotExamples = [
@@ -298,6 +352,58 @@ const PhotoPlanningTool = () => {
     }
   };
 
+  const nextStep = (): void => setCurrentStep((prev) => prev + 1);
+  const prevStep = (): void => setCurrentStep((prev) => prev - 1);
+
+  const handleSubmit = (): void => {
+    console.log("Final plan:", plan);
+    // 这里可以添加提交逻辑
+  };
+
+  const validateStep = (): boolean => {
+    switch (currentStep) {
+      case 1:
+        if (selectedStyle === null) {
+          toast.error("错误提示", {
+            description: "请选择拍摄风格选择",
+          });
+          return false;
+        }
+        break;
+      case 2:
+        if (selectedLocation === null) {
+          toast.error("错误提示", {
+            description: "请选择拍摄地点",
+          });
+          return false;
+        }
+        break;
+      case 3:
+        if (!plan.location) {
+          toast.error("错误提示", {
+            description: "请选择拍摄地点",
+          });
+          return false;
+        }
+        break;
+      case 4:
+        if (plan.shots.length === 0) {
+          toast.error("错误提示", {
+            description: "请至少添加一个分镜",
+          });
+          return false;
+        }
+        break;
+    }
+    return true;
+  };
+
+  const handleNextStep = (): void => {
+    if (validateStep()) {
+      nextStep();
+    }
+  };
+
   return (
     <div className="container mx-auto p-4 space-y-6 dark:bg-slate-900 min-h-screen">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
@@ -306,14 +412,14 @@ const PhotoPlanningTool = () => {
         <div className="flex gap-2 w-full sm:w-auto">
           <Button
             variant="outline"
-            onClick={() => setCurrentStep((prev) => Math.max(1, prev - 1))}
+            onClick={prevStep}
             disabled={currentStep === 1}
             className="flex-1 sm:flex-none dark:bg-slate-800 dark:hover:bg-slate-700"
           >
             上一步
           </Button>
           <Button
-            onClick={() => setCurrentStep((prev) => Math.min(4, prev + 1))}
+            onClick={handleNextStep}
             disabled={currentStep === 4}
             className="flex-1 sm:flex-none"
           >
@@ -324,19 +430,19 @@ const PhotoPlanningTool = () => {
 
       <ScrollArea className="w-full mb-8">
         <div className="flex gap-2 pb-2">
-          {[1, 2, 3, 4].map((step) => (
+          {Object.entries(StepNames).map(([key, value]) => (
             <Button
-              key={step}
-              variant={currentStep === step ? "default" : "outline"}
-              onClick={() => setCurrentStep(step)}
+              key={key}
+              variant={currentStep === parseInt(key) ? "default" : "outline"}
+              // onClick={() => handleJumpStep(parseInt(key))}
               className={`dark:bg-slate-800 dark:hover:bg-slate-700 
                 ${
-                  currentStep === step
+                  currentStep === parseInt(key)
                     ? "dark:bg-primary dark:text-primary-foreground"
                     : ""
                 }`}
             >
-              步骤 {step}
+              {value}
             </Button>
           ))}
         </div>
